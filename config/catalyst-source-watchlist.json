@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "timezone": "Asia/Shanghai",
+  "lookaheadDays": 7,
+  "purpose": "Source routing for the noon and evening fund catalyst ledger. Prefer primary sources and preserve first publication time.",
+  "tiers": [
+    {
+      "tier": 1,
+      "label": "official_primary",
+      "sources": [
+        "新华社",
+        "人民日报",
+        "中国政府网",
+        "外交部",
+        "国家发展改革委",
+        "工业和信息化部",
+        "科技部",
+        "中国人民银行",
+        "中国证监会",
+        "国家统计局",
+        "上海证券交易所",
+        "深圳证券交易所",
+        "地方政府新闻发布平台",
+        "基金公司公告"
+      ]
+    },
+    {
+      "tier": 2,
+      "label": "institutional_primary",
+      "sources": [
+        "券商及资产管理机构官网研究",
+        "上市公司公告与投资者关系材料",
+        "交易所行情与基金份额数据",
+        "大会官网与正式议程"
+      ]
+    },
+    {
+      "tier": 3,
+      "label": "reputable_secondary",
+      "sources": [
+        "证券时报",
+        "中国证券报",
+        "上海证券报",
+        "财新",
+        "第一财经",
+        "财联社",
+        "澎湃新闻",
+        "路透社",
+        "彭博",
+        "AP"
+      ]
+    },
+    {
+      "tier": 4,
+      "label": "lead_only",
+      "sources": [
+        "行情软件资讯",
+        "社交媒体",
+        "论坛与自媒体",
+        "转载聚合站"
+      ],
+      "rule": "May generate a lead but cannot by itself raise verification_status above unverified."
+    }
+  ],
+  "requiredFields": [
+    "first_published_at",
+    "event_start",
+    "verification_status",
+    "confidence",
+    "novelty",
+    "beneficiary_chain",
+    "portfolio_mapping",
+    "priced_in_status",
+    "validation_signals",
+    "invalidation_signals",
+    "next_checkpoint"
+  ]
+}
