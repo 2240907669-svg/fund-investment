@@ -54,12 +54,14 @@ export function loadProject(root) {
     profile: readJson('profile.json'),
     tradingConstraints: readJson('trading-constraints.json'),
     noonDecisionRules: readJson('noon-decision-rules.json'),
+    reviewLoop: readJson('review-loop.json'),
     funds: read('funds.csv'),
     fees: read('fees.csv'),
     nav: read('nav-history.csv'),
     holdings: read('holdings.csv'),
     transactions: read('transactions.csv'),
-    portfolio: read('portfolio-history.csv')
+    portfolio: read('portfolio-history.csv'),
+    decisions: fs.existsSync(path.join(absolute, 'data', 'decision-journal.csv')) ? read('decision-journal.csv') : []
   };
 }
 

@@ -38,10 +38,28 @@ function weeklyAppend(project, asOf) {
     return buy ? dayDiff(sell.confirmed_at, buy.confirmed_at) : null;
   }).filter((value) => value != null);
   const averageHold = held.length ? held.reduce((sum, value) => sum + value, 0) / held.length : null;
+  const dueDecisions = (project.decisions ?? []).filter((row) => row.evaluation_status === 'resolved' && String(row.evaluation_due_date).slice(0, 10) <= asOf);
+  const recentDecisions = dueDecisions.slice(-60);
+  const decided = recentDecisions.length;
+  const correct = recentDecisions.filter((row) => String(row.outcome_correct).toLowerCase() === 'true').length;
+  const valueAdds = recentDecisions.map((row) => Number(row.advice_value_add_vs_hold)).filter(Number.isFinite);
+  const meanValueAdd = valueAdds.length ? valueAdds.reduce((sum, value) => sum + value, 0) / valueAdds.length : null;
+  const brierRows = recentDecisions.filter((row) => ['up', 'flat', 'down'].includes(row.realized_outcome) && [row.up_probability, row.flat_probability, row.down_probability].every((value) => Number.isFinite(Number(value))));
+  const brier = brierRows.length ? brierRows.reduce((sum, row) => {
+    const probs = [Number(row.up_probability), Number(row.flat_probability), Number(row.down_probability)];
+    if (Math.max(...probs) > 1) probs.forEach((value, index) => { probs[index] = value / 100; });
+    const actual = ['up', 'flat', 'down'].map((label) => label === row.realized_outcome ? 1 : 0);
+    return sum + probs.reduce((score, probability, index) => score + (probability - actual[index]) ** 2, 0) / 3;
+  }, 0) / brierRows.length : null;
   return ['', '## 本周执行与纪律', '', `- 区间：${from} 至 ${asOf}`, `- 费用后组合变化：${weekReturn == null ? '数据不足' : formatPct(weekReturn)}`,
     `- 周内最大回撤：${values.length ? formatPct(drawdown) : '数据不足'}`, `- 确认申购/赎回：${buys.length}/${sells.length}笔`,
     `- 周换手金额：${turnover.toFixed(2)}元`, `- 已记录费用：${fees.toFixed(2)}元`,
-    `- 已完成持仓平均天数：${averageHold == null ? '数据不足' : averageHold.toFixed(1)}`, '- 命中率：需要成对的确认买卖与费用后损益后计算；数据不足时不得猜测', ''].join('\n');
+    `- 已完成持仓平均天数：${averageHold == null ? '数据不足' : averageHold.toFixed(1)}`,
+    '', '## 建议滚动自我审计', '', `- 已到期且完成复核样本：${decided}`,
+    `- 方向命中率：${decided ? formatPct(correct / decided) : '数据不足；不得猜测'}`,
+    `- 相对完全不操作的平均费用后增益：${meanValueAdd == null ? '数据不足' : formatPct(meanValueAdd)}`,
+    `- 概率Brier分数（越低越好）：${brier == null ? '数据不足' : brier.toFixed(4)}`,
+    `- 审计原则：原始预测不可覆盖；实际执行、模型执行、不操作和宽基基准分别核算。`, ''].join('\n');
 }
 
 const options = args(process.argv);

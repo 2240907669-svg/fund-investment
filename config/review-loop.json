@@ -1,0 +1,87 @@
+{
+  "objective": "通过不可篡改的原始建议、真实结果、反事实比较和规则迭代，提高费用后决策质量并降低不可接受回撤",
+  "journalFile": "data/decision-journal.csv",
+  "appendOnlyOriginalFields": true,
+  "requiredAtDecisionTime": [
+    "decision_id",
+    "record_origin",
+    "report_time",
+    "data_cutoff",
+    "decision_for_date",
+    "horizon_days",
+    "scope",
+    "original_action",
+    "target_funds",
+    "position_size",
+    "up_probability",
+    "flat_probability",
+    "down_probability",
+    "thesis",
+    "trigger_conditions",
+    "invalidation_conditions",
+    "execution_deadline",
+    "expected_nav_date",
+    "evaluation_due_date"
+  ],
+  "requiredAtReviewTime": [
+    "user_executed",
+    "actual_execution_time",
+    "actual_nav_date",
+    "actual_fee_cny",
+    "realized_outcome",
+    "actual_return_after_fee",
+    "modeled_advice_return_after_fee",
+    "hold_return_same_period",
+    "benchmark_return_same_period",
+    "advice_value_add_vs_hold",
+    "max_adverse_excursion",
+    "outcome_correct",
+    "error_type",
+    "lesson",
+    "rule_change",
+    "reviewed_at"
+  ],
+  "mandatoryComparisons": [
+    "用户实际执行（若有）",
+    "按原建议在场外规则下模型执行",
+    "同期完全不操作",
+    "同期宽基基准"
+  ],
+  "rollingWindows": [10, 20, 60],
+  "metrics": [
+    "directional_hit_rate",
+    "brier_score",
+    "mean_value_add_vs_hold_after_fee",
+    "mean_value_add_vs_benchmark_after_fee",
+    "maximum_adverse_excursion",
+    "drawdown_reduction",
+    "fee_drag",
+    "sample_size"
+  ],
+  "errorTaxonomy": [
+    "information_omission",
+    "data_quality",
+    "catalyst_already_priced",
+    "technical_signal_failure",
+    "otc_confirmation_lag",
+    "position_sizing_or_fee",
+    "risk_discipline",
+    "random_variance",
+    "other"
+  ],
+  "ruleChangeGate": {
+    "minimumResolvedSamples": 10,
+    "requireExplicitEvidence": true,
+    "requireVersionNote": true,
+    "requireUnitTests": true,
+    "requireNoLookaheadBacktest": true
+  },
+  "antiHindsightRules": [
+    "原始建议字段发布后不得覆盖",
+    "更正必须新增记录并引用原decision_id",
+    "只使用当时可得信息评价当时过程",
+    "结果评价必须使用随后正式净值和真实费用",
+    "未执行建议与实际账户收益严格分开",
+    "历史回填记录必须标记reconstructed_from_report，缺失字段留空且保留来源文件"
+  ]
+}
