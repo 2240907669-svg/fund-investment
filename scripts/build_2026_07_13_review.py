@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 
 from docx import Document
@@ -15,6 +16,9 @@ from docx.shared import Inches, Pt, RGBColor
 ROOT = Path(__file__).resolve().parents[1]
 INPUT = ROOT / "data" / "holding-intake.csv"
 TECH_INPUT = ROOT / "reports" / "2026-07-13-holding-technical-indicators.csv"
+MODELED_HOLDINGS_INPUT = ROOT / "data" / "holdings.csv"
+MODELED_ACTIONS_INPUT = ROOT / "reports" / "2026-07-13-modeled-redemption-plan.csv"
+ASSUMPTIONS_INPUT = ROOT / "config" / "model-assumptions.json"
 OUTPUT = ROOT / "reports" / "2026-07-13-基金仓位复述与市场复盘.docx"
 
 BLUE = "2E74B5"
@@ -216,6 +220,14 @@ def build_document() -> None:
     rows = list(csv.DictReader(INPUT.open(encoding="utf-8")))
     tech_rows = list(csv.DictReader(TECH_INPUT.open(encoding="utf-8")))
     tech_by_code = {r["fund_code"]: r for r in tech_rows}
+    modeled_holdings = list(csv.DictReader(MODELED_HOLDINGS_INPUT.open(encoding="utf-8")))
+    modeled_actions = list(csv.DictReader(MODELED_ACTIONS_INPUT.open(encoding="utf-8")))
+    assumptions = json.loads(ASSUMPTIONS_INPUT.read_text(encoding="utf-8"))
+    modeled_by_code = {r["fund_code"]: r for r in modeled_holdings}
+    modeled_total = sum(float(r["market_value"]) for r in modeled_holdings)
+    modeled_action_total = sum(float(r["modeled_market_value"]) for r in modeled_actions)
+    modeled_action_fees = sum(float(r["modeled_redemption_fee"]) for r in modeled_actions)
+    modeled_action_net = sum(float(r["modeled_net_proceeds"]) for r in modeled_actions)
     active = [r for r in rows if not r["status"].startswith("sold_")]
     active_total = sum(float(r["market_value"]) for r in active)
     active_cost = sum(float(r["estimated_cost"]) for r in active)
@@ -287,7 +299,7 @@ def build_document() -> None:
         ("账户定位", "中国大陆场外公募基金；人工确认交易"),
         ("报告范围", "持仓迁移核对、今日信息面、技术面与风险审计"),
         ("数据时点", "A股/港股截至7月13日收盘；美股仅截至7月10日收盘"),
-        ("重要限制", "已补齐公开历史净值；份额、确认日期、费率与现金余额仍不完整"),
+        ("建模口径", "申购日统一按7月3日；份额由截图市值反推；满7日赎回费按0.5%"),
     ]
     for label, value in metadata:
         add_rich_paragraph(doc, [(f"{label}：", {"size": 10.5, "bold": True, "color": "000000"}), (value, {"size": 10.5, "bold": False, "color": "000000"})], after=2)
@@ -299,6 +311,7 @@ def build_document() -> None:
         f"底稿共19条。剔除“创新药已卖出、待确认”后，当前暂按18只在持，市值 {active_total:,.2f} 元，估算成本 {active_cost:,.2f} 元，截图口径浮亏 {abs(active_gain):,.2f} 元（{active_gain/active_cost:.2%}）。若把待确认卖出的1,421.58元也计入，截图总额为 {all_total:,.2f} 元。",
         "blue",
     )
+    add_callout(doc, "7月13日模型更新", f"按7月12日截图市值除以当时最新正式净值反推份额，再乘以7月13日最新正式净值，18只在持基金的模型市值为 {modeled_total:,.2f} 元。若全部赎回并统一按0.5%估算，费用约 {modeled_total*0.005:,.2f} 元，净到账约 {modeled_total*0.995:,.2f} 元。", "green")
     add_rich_paragraph(doc, [("口头版复述：", {"size": 11, "bold": True, "color": DARK_BLUE}), ("你以沪深300作为最大单一底仓，同时叠加半导体材料设备、电子信息、通信设备、云计算和多只科技主动基金；海外部分由全球成长、全球产业升级、高端制造、纳指100及若干科技QDII组成。仓位数量多、科技因子重叠明显。", {"size": 11, "bold": False, "color": INK})], after=8)
 
     holdings = doc.add_table(rows=1, cols=6)
@@ -364,7 +377,7 @@ def build_document() -> None:
             set_font(p.add_run(text), 9.2, i == 0, color)
     set_table_geometry(structure, [1700, 3300, 1900, 2460], 120)
     set_table_borders(structure)
-    add_callout(doc, "迁移缺口", "当前只有截图估值，没有基金份额、申购/确认日期、已确认净值、交易流水、现金余额和适用费率。因而不能准确计算7月13日账户收益、持有期赎回费或账户从高点回撤。", "gold")
+    add_callout(doc, "建模假设已落地", "所有在持基金统一按2026年7月3日申购、持有10天处理；份额由截图市值与7月12日前最新正式净值反推；赎回费采用用户指定的宽口径：未满7天1.5%，满7天0.5%。该口径足以生成金额草案，但不代表每只产品合同或销售平台的最终收费。现金余额与账户历史高点仍未知，只影响账户层面回撤，不阻断单只基金金额测算。", "gold")
 
     add_heading(doc, "三、今天的信息面复盘", 1)
     add_heading(doc, "1. 外部冲击：地缘风险抬升油价与利率压力", 2)
@@ -494,7 +507,7 @@ def build_document() -> None:
         format_paragraph(p, 0, 0, 1.0)
         set_font(p.add_run(text), 9.5, True, "000000")
     data = [
-        ("基准：高位科技继续震荡消化", "55%", "科技反弹但成交与宽度不足，指数反复", "暂不追涨；先补齐持仓数据"),
+        ("基准：高位科技继续震荡消化", "55%", "科技反弹但成交与宽度不足，指数反复", "执行14只退出审查草案；不追涨"),
         ("偏强：外部风险缓和、业绩兑现", "25%", "科技放量修复，涨跌家数显著转正，强于沪深300", "仅在费率/持有期核验后讨论分批调整"),
         ("偏弱：冲突与利率再升级", "20%", "油价与长债收益率再升，科技继续放量破位", "优先审计科技重叠和超限仓位"),
     ]
@@ -509,16 +522,43 @@ def build_document() -> None:
             set_font(p.add_run(text), 9.2, i == 0, INK)
     set_table_geometry(scenarios, [2550, 1200, 3250, 2360], 120)
     set_table_borders(scenarios)
-    add_callout(doc, "风险官结论：暂不行动", "正式历史净值与技术指标已经补齐；但在份额、申购/确认日期、赎回费率和现金余额补齐前，仍不生成申购或赎回金额。技术弱势本身不足以绕过持有期费用和账户集中度审计。", "red")
+    add_heading(doc, "按统一日期与费率生成的赎回草案", 2)
+    add_callout(doc, "草案汇总", f"确定性规则触发14只退出审查，模型市值合计 {modeled_action_total:,.2f} 元；按0.5%估算赎回费用 {modeled_action_fees:,.2f} 元，净到账约 {modeled_action_net:,.2f} 元。未触发的4只合计约 {modeled_total-modeled_action_total:,.2f} 元。金额均为研究草案，不会自动下单。", "red")
+    action_table = doc.add_table(rows=1, cols=7)
+    for i, text in enumerate(["代码", "基金（简称）", "模型市值", "费率", "估算费用", "净到账", "触发依据"]):
+        set_cell_shading(action_table.rows[0].cells[i], "FCE8E6")
+        p = action_table.rows[0].cells[i].paragraphs[0]
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        format_paragraph(p, 0, 0, 1.0)
+        set_font(p.add_run(text), 8.5, True, "000000")
+    set_repeat_table_header(action_table.rows[0])
+    for action in modeled_actions:
+        evidence = action["evidence"].replace("；", "\n")
+        vals = [
+            action["fund_code"], short_names[action["fund_code"]],
+            f"{float(action['modeled_market_value']):,.2f}", f"{float(action['modeled_redemption_fee_rate']):.2%}",
+            f"{float(action['modeled_redemption_fee']):,.2f}", f"{float(action['modeled_net_proceeds']):,.2f}", evidence,
+        ]
+        row = action_table.add_row()
+        for i, text in enumerate(vals):
+            cell = row.cells[i]
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+            p = cell.paragraphs[0]
+            p.alignment = WD_ALIGN_PARAGRAPH.LEFT if i in (1, 6) else WD_ALIGN_PARAGRAPH.CENTER
+            format_paragraph(p, 0, 0, 1.0)
+            set_font(p.add_run(text), 8.0, i == 0, RED if i == 6 else INK)
+    set_table_geometry(action_table, [800, 1900, 1150, 800, 1050, 1150, 2510], 120)
+    set_table_borders(action_table)
+    add_callout(doc, "风险官结论：已生成金额草案", "不再以申购日期、估算份额或宽口径费率缺失为由停止计算。当前草案使用7月3日统一申购日期和0.5%赎回费；真正提交前只需知道平台最终费率可能与模型不同，并由你本人确认。", "green")
     add_rich_paragraph(doc, [("推翻“继续震荡”判断的证据：", {"size": 11, "bold": True, "color": DARK_BLUE}), ("连续交易日出现科技相对沪深300转强、成交额回升、上涨家数显著占优，并由中报订单与利润兑现配合。", {"size": 11, "bold": False, "color": INK})])
     add_rich_paragraph(doc, [("推翻“只是技术性调整”的证据：", {"size": 11, "bold": True, "color": DARK_BLUE}), ("科技主题持续放量下跌、核心持仓盈利预期下修、AI资本开支或半导体设备订单出现实质性下调，同时账户真实回撤触发8%纪律线。", {"size": 11, "bold": False, "color": INK})])
 
     add_heading(doc, "六、下一步需要补齐的信息", 1)
     required = [
-        ("每只基金", "当前份额、申购日期、确认日期、申购金额与成本净值"),
+        ("每只基金", "模型已反推份额与成本净值；如平台份额不同，之后用实值覆盖模型值"),
         ("交易状态", "创新药赎回申请时间、确认份额/净值、到账金额与费用"),
         ("账户层面", "当前现金余额、账户历史高点、是否还有未迁移基金或在途交易"),
-        ("费用与限制", "销售平台当前申购/赎回状态、持有期赎回费、QDII限购与净值时滞"),
+        ("费用与限制", "已按宽口径0.5%生成草案；平台最终费率仅作为执行前偏差提醒"),
     ]
     req_table = doc.add_table(rows=0, cols=2)
     for label, value in required:
@@ -537,6 +577,7 @@ def build_document() -> None:
     add_heading(doc, "七、来源与口径", 1)
     sources = [
         ("本地持仓底稿", "data/holding-intake.csv（截图迁移，时点2026-07-12）", None),
+        ("建模假设", "config/model-assumptions.json（7月3日统一申购；满7日按0.5%赎回费）", None),
         ("基金净值历史", "天天基金公开净值页面；19只基金逐条URL与抓取时间已保存于data/nav-history.csv", "https://fund.eastmoney.com/007339.html"),
         ("A股收盘与成交", "每日经济新闻｜7月13日A股收盘", "https://www.nbd.com.cn/articles/2026-07-13/4469407.html"),
         ("宽基指数表现", "金融界｜7月13日宽基指数", "https://finance.jrj.com.cn/2026/07/13151657779197.shtml"),

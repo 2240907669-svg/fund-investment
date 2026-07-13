@@ -1,0 +1,11 @@
+{
+  "asOf": "2026-07-13",
+  "snapshotAsOf": "2026-07-12",
+  "modeledPurchaseDate": "2026-07-03",
+  "holdingDays": 10,
+  "redemptionFeeRule": {
+    "under7Days": 0.015,
+    "from7Days": 0.005
+  },
+  "provenance": "User-declared modeling assumptions; not a substitute for each fund's official fee schedule or platform confirmation."
+}
