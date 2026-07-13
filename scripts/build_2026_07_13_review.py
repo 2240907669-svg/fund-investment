@@ -14,6 +14,7 @@ from docx.shared import Inches, Pt, RGBColor
 
 ROOT = Path(__file__).resolve().parents[1]
 INPUT = ROOT / "data" / "holding-intake.csv"
+TECH_INPUT = ROOT / "reports" / "2026-07-13-holding-technical-indicators.csv"
 OUTPUT = ROOT / "reports" / "2026-07-13-基金仓位复述与市场复盘.docx"
 
 BLUE = "2E74B5"
@@ -117,7 +118,7 @@ def set_font(run, size=11, bold=False, color=INK, italic=False) -> None:
     run.font.name = "Calibri"
     run._element.get_or_add_rPr().rFonts.set(qn("w:ascii"), "Calibri")
     run._element.get_or_add_rPr().rFonts.set(qn("w:hAnsi"), "Calibri")
-    run._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"), "PingFang SC")
+    run._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"), "Arial Unicode MS")
     run.font.size = Pt(size)
     run.bold = bold
     run.italic = italic
@@ -181,7 +182,7 @@ def add_hyperlink(paragraph, text: str, url: str):
     rfonts = OxmlElement("w:rFonts")
     rfonts.set(qn("w:ascii"), "Calibri")
     rfonts.set(qn("w:hAnsi"), "Calibri")
-    rfonts.set(qn("w:eastAsia"), "PingFang SC")
+    rfonts.set(qn("w:eastAsia"), "Arial Unicode MS")
     size = OxmlElement("w:sz")
     size.set(qn("w:val"), "20")
     r_pr.extend([rfonts, color, underline, size])
@@ -213,6 +214,8 @@ def add_page_number(paragraph) -> None:
 
 def build_document() -> None:
     rows = list(csv.DictReader(INPUT.open(encoding="utf-8")))
+    tech_rows = list(csv.DictReader(TECH_INPUT.open(encoding="utf-8")))
+    tech_by_code = {r["fund_code"]: r for r in tech_rows}
     active = [r for r in rows if not r["status"].startswith("sold_")]
     active_total = sum(float(r["market_value"]) for r in active)
     active_cost = sum(float(r["estimated_cost"]) for r in active)
@@ -241,7 +244,7 @@ def build_document() -> None:
     normal.font.name = "Calibri"
     normal._element.rPr.rFonts.set(qn("w:ascii"), "Calibri")
     normal._element.rPr.rFonts.set(qn("w:hAnsi"), "Calibri")
-    normal._element.rPr.rFonts.set(qn("w:eastAsia"), "PingFang SC")
+    normal._element.rPr.rFonts.set(qn("w:eastAsia"), "Arial Unicode MS")
     normal.font.size = Pt(11)
     normal.font.color.rgb = RGBColor.from_string(INK)
     normal.paragraph_format.space_before = Pt(0)
@@ -256,7 +259,7 @@ def build_document() -> None:
         style.font.name = "Calibri"
         style._element.rPr.rFonts.set(qn("w:ascii"), "Calibri")
         style._element.rPr.rFonts.set(qn("w:hAnsi"), "Calibri")
-        style._element.rPr.rFonts.set(qn("w:eastAsia"), "PingFang SC")
+        style._element.rPr.rFonts.set(qn("w:eastAsia"), "Arial Unicode MS")
         style.font.size = Pt(size)
         style.font.bold = True
         style.font.color.rgb = RGBColor.from_string(color)
@@ -284,7 +287,7 @@ def build_document() -> None:
         ("账户定位", "中国大陆场外公募基金；人工确认交易"),
         ("报告范围", "持仓迁移核对、今日信息面、技术面与风险审计"),
         ("数据时点", "A股/港股截至7月13日收盘；美股仅截至7月10日收盘"),
-        ("重要限制", "当日基金正式净值、份额、确认日期、费率与现金余额不完整"),
+        ("重要限制", "已补齐公开历史净值；份额、确认日期、费率与现金余额仍不完整"),
     ]
     for label, value in metadata:
         add_rich_paragraph(doc, [(f"{label}：", {"size": 10.5, "bold": True, "color": "000000"}), (value, {"size": 10.5, "bold": False, "color": "000000"})], after=2)
@@ -408,7 +411,79 @@ def build_document() -> None:
     set_table_borders(market)
 
     add_rich_paragraph(doc, [("技术结论。", {"size": 11, "bold": True, "color": DARK_BLUE}), ("今天是“低开—弱反弹—继续走低”的广泛风险收缩日，且科技成长显著弱于宽基。缩量大跌不等于止跌：它说明买盘退缩，但尚未出现足以确认筹码充分交换的放量企稳。短线需要等待价格、成交和市场宽度同时改善。", {"size": 11, "bold": False, "color": INK})], before=8)
-    add_callout(doc, "不能做的技术判断", "底稿没有任何基金净值历史，无法合规计算20日/60日均线、RSI、最大回撤或相对强弱序列。因此本报告只使用当日指数、成交与市场宽度，不伪造精确买卖点。", "gold")
+    add_heading(doc, "持仓基金的净值技术指标", 2)
+    add_callout(doc, "数据已主动补齐", "已从公开基金净值页面同步19只基金共23,428条正式历史净值。12只境内基金最新净值日期为7月13日；7只QDII最新为7月10日，属于跨时区净值确认时滞，不当作7月13日盘中价格。", "green")
+    add_rich_paragraph(doc, [("组合读数。", {"size": 11, "bold": True, "color": DARK_BLUE}), ("剔除已卖待确认的创新药后，18只在持基金中只有3只站上20日均线，对应截图市值7,484.25元、占在持市值18.95%；其余15只占81.05%，均在20日均线下。RSI集中在40.12—59.10，没有极端超买或超卖，说明当前更像趋势降温与结构分化，而不是单一指标给出的反转点。", {"size": 11, "bold": False, "color": INK})], after=8)
+
+    tech = doc.add_table(rows=1, cols=7)
+    for i, text in enumerate(["代码", "基金（简称）", "最新净值/日期", "相对MA20", "相对MA60", "RSI14", "结构"]):
+        set_cell_shading(tech.rows[0].cells[i], LIGHT)
+        p = tech.rows[0].cells[i].paragraphs[0]
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        format_paragraph(p, 0, 0, 1.0)
+        set_font(p.add_run(text), 8.8, True, "000000")
+    set_repeat_table_header(tech.rows[0])
+    short_names = {
+        "007339": "沪深300联接C", "021894": "半导体材料设备C", "010004": "电子信息产业C",
+        "012922": "全球成长QDII C", "021528": "财通成长优选C", "007818": "通信设备联接C",
+        "019024": "信息行业精选C", "024481": "财通品质甄选C", "017731": "全球产业升级QDII C",
+        "014565": "创新药50联接C", "019331": "沪深港云计算C", "016665": "全球高端制造QDII C",
+        "006479": "纳指100 QDII C", "016371": "信澳业绩驱动C", "006503": "集成电路产业C",
+        "002891": "移动互联QDII", "539002": "新兴市场QDII A", "006373": "全球科技互联QDII A",
+        "021873": "沪深港黄金产业A",
+    }
+    for source_row in rows:
+        t = tech_by_code[source_row["fund_code"]]
+        sold = source_row["status"].startswith("sold_")
+        vals = [
+            source_row["fund_code"], short_names[source_row["fund_code"]],
+            f"{float(t['latest_nav']):.4f}\n{t['latest_date']}",
+            f"{float(t['nav_vs_ma20']):+.2%}", f"{float(t['nav_vs_ma60']):+.2%}",
+            t["rsi14"], ("已卖待确认；" if sold else "") + t["technical_state"],
+        ]
+        row = tech.add_row()
+        for i, text in enumerate(vals):
+            cell = row.cells[i]
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+            p = cell.paragraphs[0]
+            p.alignment = WD_ALIGN_PARAGRAPH.LEFT if i in (1, 6) else WD_ALIGN_PARAGRAPH.CENTER
+            format_paragraph(p, 0, 0, 1.0)
+            value_for_color = float(t["nav_vs_ma20"]) if i == 3 else None
+            color = MUTED if sold else (RED if value_for_color is not None and value_for_color < 0 else INK)
+            set_font(p.add_run(text), 8.0, i == 0, color)
+    set_table_geometry(tech, [820, 1900, 1420, 1100, 1100, 900, 2120], 120)
+    set_table_borders(tech)
+
+    add_heading(doc, "收益、回撤与相对强弱", 2)
+    performance = doc.add_table(rows=1, cols=7)
+    for i, text in enumerate(["代码", "20日收益", "60日收益", "60日最大回撤", "历史最大回撤", "相对沪深300 20日", "相对沪深300 60日"]):
+        set_cell_shading(performance.rows[0].cells[i], PALE_BLUE)
+        p = performance.rows[0].cells[i].paragraphs[0]
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        format_paragraph(p, 0, 0, 1.0)
+        set_font(p.add_run(text), 8.2, True, "000000")
+    set_repeat_table_header(performance.rows[0])
+    for source_row in rows:
+        t = tech_by_code[source_row["fund_code"]]
+        sold = source_row["status"].startswith("sold_")
+        vals = [
+            source_row["fund_code"], f"{float(t['return_20obs']):+.2%}", f"{float(t['return_60obs']):+.2%}",
+            f"-{float(t['drawdown_60obs']):.2%}", f"-{float(t['max_drawdown_full_history']):.2%}",
+            f"{float(t['relative_20obs_vs_007339']):+.2%}", f"{float(t['relative_60obs_vs_007339']):+.2%}",
+        ]
+        row = performance.add_row()
+        for i, text in enumerate(vals):
+            cell = row.cells[i]
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+            p = cell.paragraphs[0]
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            format_paragraph(p, 0, 0, 1.0)
+            color = MUTED if sold else (RED if i in (1, 2, 5, 6) and float(text.replace("%", "")) < 0 else INK)
+            set_font(p.add_run(text), 8.2, i == 0, color)
+    set_table_geometry(performance, [850, 1200, 1200, 1500, 1500, 1555, 1555], 120)
+    set_table_borders(performance)
+    add_rich_paragraph(doc, [("口径说明。", {"size": 9.5, "bold": True, "color": MUTED}), ("MA20/MA60为最近20/60个已公布净值观察值的简单均线；RSI14使用Wilder平滑；回撤由基金净值序列计算，不等同于你的账户回撤；相对强弱为基金同期收益减去007339沪深300联接C同期收益。QDII日期按其已公布净值，不用7月13日海外盘中行情回填。", {"size": 9.5, "bold": False, "color": MUTED})], before=6, after=8, line=1.05)
+    add_callout(doc, "持仓技术结论", "半导体材料设备联接C仍是最强持仓：净值高于MA20约1.48%、高于MA60约29.41%，RSI 59.10，20日相对沪深300强约29.66个百分点。云计算联接C和纳指100联接C也在MA20上方。相对较弱的在持基金是集成电路产业C、财通品质甄选C和财通成长优选C，分别低于MA20约17.73%、16.14%和15.91%。这些是趋势状态，不是脱离费用与持有期的即时买卖指令。", "gold")
 
     add_heading(doc, "五、情景、行动与失效条件", 1)
     scenarios = doc.add_table(rows=1, cols=4)
@@ -434,13 +509,13 @@ def build_document() -> None:
             set_font(p.add_run(text), 9.2, i == 0, INK)
     set_table_geometry(scenarios, [2550, 1200, 3250, 2360], 120)
     set_table_borders(scenarios)
-    add_callout(doc, "风险官结论：暂不行动", "在份额、申购日期、确认净值、赎回费率、现金余额和今日正式净值补齐前，不生成申购或赎回金额。今天的市场下跌本身不足以证明长期逻辑失效，也不足以证明已经见底。", "red")
+    add_callout(doc, "风险官结论：暂不行动", "正式历史净值与技术指标已经补齐；但在份额、申购/确认日期、赎回费率和现金余额补齐前，仍不生成申购或赎回金额。技术弱势本身不足以绕过持有期费用和账户集中度审计。", "red")
     add_rich_paragraph(doc, [("推翻“继续震荡”判断的证据：", {"size": 11, "bold": True, "color": DARK_BLUE}), ("连续交易日出现科技相对沪深300转强、成交额回升、上涨家数显著占优，并由中报订单与利润兑现配合。", {"size": 11, "bold": False, "color": INK})])
     add_rich_paragraph(doc, [("推翻“只是技术性调整”的证据：", {"size": 11, "bold": True, "color": DARK_BLUE}), ("科技主题持续放量下跌、核心持仓盈利预期下修、AI资本开支或半导体设备订单出现实质性下调，同时账户真实回撤触发8%纪律线。", {"size": 11, "bold": False, "color": INK})])
 
     add_heading(doc, "六、下一步需要补齐的信息", 1)
     required = [
-        ("每只基金", "当前份额、申购日期、确认日期、申购金额、已确认最新净值"),
+        ("每只基金", "当前份额、申购日期、确认日期、申购金额与成本净值"),
         ("交易状态", "创新药赎回申请时间、确认份额/净值、到账金额与费用"),
         ("账户层面", "当前现金余额、账户历史高点、是否还有未迁移基金或在途交易"),
         ("费用与限制", "销售平台当前申购/赎回状态、持有期赎回费、QDII限购与净值时滞"),
@@ -458,9 +533,11 @@ def build_document() -> None:
     set_table_geometry(req_table, [1900, 7460], 120)
     set_table_borders(req_table)
 
+    doc.add_page_break()
     add_heading(doc, "七、来源与口径", 1)
     sources = [
         ("本地持仓底稿", "data/holding-intake.csv（截图迁移，时点2026-07-12）", None),
+        ("基金净值历史", "天天基金公开净值页面；19只基金逐条URL与抓取时间已保存于data/nav-history.csv", "https://fund.eastmoney.com/007339.html"),
         ("A股收盘与成交", "每日经济新闻｜7月13日A股收盘", "https://www.nbd.com.cn/articles/2026-07-13/4469407.html"),
         ("宽基指数表现", "金融界｜7月13日宽基指数", "https://finance.jrj.com.cn/2026/07/13151657779197.shtml"),
         ("A股跌幅与原因", "东方财富｜A股大跌，发生了什么", "https://finance.eastmoney.com/a/202607133804134796.html"),
