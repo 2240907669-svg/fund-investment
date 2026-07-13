@@ -65,6 +65,13 @@ def set_repeat_table_header(row) -> None:
     tr_pr.append(tbl_header)
 
 
+def set_row_cant_split(row) -> None:
+    tr_pr = row._tr.get_or_add_trPr()
+    cant_split = OxmlElement("w:cantSplit")
+    cant_split.set(qn("w:val"), "true")
+    tr_pr.append(cant_split)
+
+
 def set_table_borders(table, color="D0D5DD", size="4") -> None:
     tbl_pr = table._tbl.tblPr
     borders = tbl_pr.find(qn("w:tblBorders"))
@@ -157,6 +164,7 @@ def add_callout(doc, label: str, text: str, tone="blue") -> None:
     fills = {"blue": PALE_BLUE, "red": "FCE8E6", "gold": "FFF4CE", "green": "E6F4EA"}
     colors = {"blue": DARK_BLUE, "red": RED, "gold": GOLD, "green": GREEN}
     table = doc.add_table(rows=1, cols=1)
+    set_row_cant_split(table.rows[0])
     set_table_geometry(table, [9360], 120)
     set_table_borders(table, fills[tone], "2")
     cell = table.cell(0, 0)
@@ -337,6 +345,7 @@ def build_document() -> None:
             "已卖待确认" if sold else "暂按在持",
         ]
         row = holdings.add_row()
+        set_row_cant_split(row)
         for i, text in enumerate(vals):
             cell = row.cells[i]
             cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
@@ -540,6 +549,7 @@ def build_document() -> None:
             f"{float(action['modeled_redemption_fee']):,.2f}", f"{float(action['modeled_net_proceeds']):,.2f}", evidence,
         ]
         row = action_table.add_row()
+        set_row_cant_split(row)
         for i, text in enumerate(vals):
             cell = row.cells[i]
             cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
