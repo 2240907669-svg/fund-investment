@@ -45,9 +45,15 @@ export function writeCsv(file, rows, headers) {
 export function loadProject(root) {
   const absolute = path.resolve(root);
   const read = (name) => readCsv(path.join(absolute, 'data', name));
+  const readJson = (name, fallback = {}) => {
+    const file = path.join(absolute, 'config', name);
+    return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : fallback;
+  };
   return {
     root: absolute,
-    profile: JSON.parse(fs.readFileSync(path.join(absolute, 'config', 'profile.json'), 'utf8')),
+    profile: readJson('profile.json'),
+    tradingConstraints: readJson('trading-constraints.json'),
+    noonDecisionRules: readJson('noon-decision-rules.json'),
     funds: read('funds.csv'),
     fees: read('fees.csv'),
     nav: read('nav-history.csv'),
@@ -233,8 +239,8 @@ export function planActions(project, scores, asOf) {
       const amount = number(holding.market_value, number(holding.shares) * current);
       actions.push({
         fund: fundByCode.get(holding.fund_code) ?? { fund_code: holding.fund_code, fund_name: '未知基金', share_class: '' },
-        action: vetoes.length ? '退出审查' : '赎回草案', amount, feeRate: fee?.redemptionRate ?? null,
-        confirmDate: '以销售平台确认规则为准', deadline: '15:00前提交方按当日申请处理',
+        action: vetoes.length ? '退出审查' : '赎回草案', amount, redemptionShares: number(holding.shares), redemptionPercentage: 1, feeRate: fee?.redemptionRate ?? null,
+        expectedNavDate: asOf, confirmDate: '以销售平台确认规则为准', deadline: '平台截止时间前提交；通常15:00前按申请日未知净值处理',
         evidence: `持仓收益${formatPct(positionReturn)}；${belowTwoDays ? '连续两日低于20日均线' : risk.riskMode ? '账户风险模式' : '触发4%回撤审查'}`,
         confidence: result?.confidence ?? '低', invalidation: '最新已公布净值恢复且风险触发解除', vetoes
       });
@@ -265,8 +271,9 @@ export function planActions(project, scores, asOf) {
     if (amount < profile.minOrderCny) continue;
     actions.push({
       fund: result.fund, action: '申购草案', amount, feeRate: result.fee.totalRate,
+      expectedNavDate: asOf,
       confirmDate: bool(result.fund.is_qdii) ? '通常T+2或更晚，以产品文件为准' : '通常T+1，以产品文件为准',
-      deadline: '15:00前提交方按当日申请处理',
+      deadline: '平台截止时间前提交；通常15:00前按申请日未知净值处理',
       evidence: `综合分${result.score.toFixed(2)}；5/10/20日收益${formatPct(result.return5)}/${formatPct(result.return10)}/${formatPct(result.return20)}`,
       confidence: result.confidence, invalidation: '净值跌回20日均线下、申购状态变化或费用后动量转负', vetoes: []
     });
@@ -297,7 +304,8 @@ export function formatPct(value) {
 export function renderReport(project, scores, plan, asOf, mode) {
   const title = mode === 'morning' ? '晨间风险简报' : mode === 'weekly' ? '周复盘' : '15:00前行动简报';
   const now = new Date().toISOString();
-  const lines = [`# ${asOf} ${title}`, '', `- 生成时间：${now}`, `- 数据截止：${asOf}；评分只使用已公布净值`, `- 账户回撤：${formatPct(plan.risk.drawdown)}；风险模式：${plan.risk.riskMode ? '是' : '否'}`, '- 性质：研究与执行草案，不是收益保证，不会自动下单', ''];
+  const cutoff = project.tradingConstraints?.defaultPlatformCutoff ?? '通常为开放日15:00，以平台为准';
+  const lines = [`# ${asOf} ${title}`, '', `- 生成时间：${now}`, `- 数据截止：${asOf}；评分只使用已公布净值`, `- 账户回撤：${formatPct(plan.risk.drawdown)}；风险模式：${plan.risk.riskMode ? '是' : '否'}`, '- 账户范围：只交易场外开放式基金，不做盘中ETF或股票交易', `- 未知价原则：盘中数据只决定是否提交申请，实际按正式基金净值确认；默认截止：${cutoff}`, '- 性质：研究与执行草案，不是收益保证，不会自动下单', ''];
   if (plan.risk.warning) lines.push(`> 数据提示：${plan.risk.warning}`, '');
   if (plan.risk.riskMode) lines.push(`> 风险官否决新增申购：风险资产上限40%，冷静期剩余${plan.risk.cooldownRemaining}个有记录交易日。`, '');
   lines.push('## 候选排名', '');
@@ -310,8 +318,12 @@ export function renderReport(project, scores, plan, asOf, mode) {
   lines.push('## 操作草案', '');
   if (!plan.actions.length) lines.push('暂不行动：当前没有通过风险官检查且需要执行的操作。', '');
   else plan.actions.forEach((action, index) => {
+    const orderSize = action.action === '申购草案'
+      ? `- 申购申请金额：${Math.floor(action.amount).toLocaleString('zh-CN')}元`
+      : `- 赎回申请：${action.redemptionShares ? `${action.redemptionShares.toLocaleString('zh-CN')}份（当前规则草案为${(action.redemptionPercentage * 100).toFixed(0)}%份额）` : '份额待平台确认页核对'}`;
     lines.push(`### ${index + 1}. ${action.fund.fund_name} ${action.fund.share_class}（${action.fund.fund_code}）`, '',
-      `- 操作：${action.action}`, `- 建议金额：${Math.floor(action.amount).toLocaleString('zh-CN')}元`,
+      `- 操作：${action.action}`, orderSize, `- 当前净值口径的市值估算：${Math.floor(action.amount).toLocaleString('zh-CN')}元（不是成交金额）`,
+      `- 预计适用净值日：${action.expectedNavDate ?? '以提交时间与平台规则为准'}；成交净值提交时未知`,
       `- 预计确认：${action.confirmDate}`, `- 预计全部费用率：${action.feeRate == null ? '未知' : formatPct(action.feeRate)}`,
       `- 信号依据：${action.evidence}`, `- 置信度：${action.confidence}`, `- 最晚操作时间：${action.deadline}`,
       `- 失效条件：${action.invalidation}`, `- 风险否决项：${action.vetoes.length ? action.vetoes.join('；') : '无'}`, '');
@@ -319,7 +331,7 @@ export function renderReport(project, scores, plan, asOf, mode) {
   const rejected = scores.filter((item) => !item.eligible);
   lines.push('## 数据与否决审计', '', `- 候选总数：${scores.length}；通过：${scores.length - rejected.length}；否决：${rejected.length}`);
   rejected.slice(0, 10).forEach((item) => lines.push(`- ${item.fund.fund_code} ${item.fund.fund_name}：${item.vetoes.join('；') || '未知原因'}`));
-  lines.push('', '## 来源', '', '- 净值来源逐条保存在 `data/nav-history.csv`。', '- 费率来源逐档保存在 `data/fees.csv`；建议执行前仍须在销售平台核对。', '- 监管费率底线：https://www.csrc.gov.cn/csrc/c101954/c7606091/content.shtml', '');
+  lines.push('', '## 来源', '', '- 净值来源逐条保存在 `data/nav-history.csv`。', '- 场外交易机制保存在 `config/trading-constraints.json`；产品合同、公告和销售平台特殊规则优先。', '- 费率来源逐档保存在 `data/fees.csv`；建议执行前仍须在销售平台核对。', '- 监管费率底线：https://www.csrc.gov.cn/csrc/c101954/c7606091/content.shtml', '');
   return lines.join('\n');
 }
 

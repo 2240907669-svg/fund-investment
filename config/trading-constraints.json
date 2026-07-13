@@ -1,0 +1,46 @@
+{
+  "accountScope": "mainland_china_otc_open_end_funds_only",
+  "allowedInstruments": [
+    "场外开放式公募基金",
+    "ETF联接基金",
+    "QDII场外基金"
+  ],
+  "disallowedExecutionAssumptions": [
+    "交易所内ETF或股票盘中成交",
+    "按盘中估值或指数点位成交",
+    "同一交易日低买高卖或回转交易",
+    "等待收盘确认信号后仍假设按当日净值提交"
+  ],
+  "pricingPrinciple": "unknown_price",
+  "defaultPlatformCutoff": "15:00 Asia/Shanghai on an open day",
+  "beforeCutoff": "申请通常适用申请日收盘后计算的正式基金份额净值",
+  "afterCutoff": "申请通常按下一开放日受理并适用下一开放日净值",
+  "subscriptionInput": "amount_cny",
+  "redemptionInput": "shares_or_percentage",
+  "intradayDataRole": "decision_signal_only_not_execution_price",
+  "productOverride": "基金合同、公告或销售平台的特殊截止时间和确认规则优先",
+  "requiredActionFields": [
+    "submit_or_wait",
+    "latest_submit_time",
+    "expected_nav_date",
+    "subscription_amount_cny_or_redemption_share_percentage",
+    "estimated_fee_rule",
+    "expected_confirmation_and_cash_arrival",
+    "trigger_thresholds",
+    "invalidation_conditions"
+  ],
+  "officialSources": [
+    {
+      "title": "公开募集证券投资基金运作管理办法（第十七至十八条）",
+      "url": "https://www.csrc.gov.cn/csrc/c106256/c1653978/content.shtml"
+    },
+    {
+      "title": "中华人民共和国证券投资基金法（第七十条）",
+      "url": "https://www.csrc.gov.cn/csrc/c101939/c1045353/content.shtml"
+    },
+    {
+      "title": "基金基础知识概览（未知价、15:00、金额申购份额赎回）",
+      "url": "https://investor.amac.org.cn/investread/tzbdjczs/202304/P020230410430547949360.pdf"
+    }
+  ]
+}
