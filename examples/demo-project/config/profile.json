@@ -1,0 +1,21 @@
+{
+  "timezone": "Asia/Shanghai",
+  "capitalCny": 30000,
+  "targetHoldingDays": 14,
+  "minHistoryDays": 60,
+  "minAumCny": 100000000,
+  "maxPositions": 3,
+  "maxFundWeight": 0.25,
+  "maxThemeWeight": 0.4,
+  "maxQdiiWeight": 0.25,
+  "minCashWeight": 0.25,
+  "positionReviewDrawdown": 0.04,
+  "accountDrawdownTrigger": 0.08,
+  "riskModeMaxInvestedWeight": 0.4,
+  "cooldownTradingDays": 5,
+  "maxStaleDaysDomestic": 3,
+  "maxStaleDaysQdii": 5,
+  "minOrderCny": 100,
+  "rebalanceEveryTradingDays": 5,
+  "backtestMinObservations": 252
+}

@@ -1,0 +1,5 @@
+fund_code,fund_name,share_class,base_fund,category,theme,is_qdii,aum_cny,age_days,purchase_status,redemption_status,daily_limit_cny,lock_days,tracking_error,fee_source,fee_verified_at
+900001,演示宽基A,A,demo-wide,index,宽基,false,500000000,800,open,open,50000,0,0.003,https://example.invalid/demo-wide-a,2026-06-01
+900002,演示宽基C,C,demo-wide,index,宽基,false,500000000,800,open,open,50000,0,0.003,https://example.invalid/demo-wide-c,2026-06-01
+900003,演示科技指数C,C,demo-tech,index,科技,false,300000000,600,open,open,50000,0,0.005,https://example.invalid/demo-tech,2026-06-01
+900004,演示QDII指数C,C,demo-global,qdii-index,海外,true,400000000,900,open,open,10000,0,0.006,https://example.invalid/demo-global,2026-06-01

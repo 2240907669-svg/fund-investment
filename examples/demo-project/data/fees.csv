@@ -1,0 +1,13 @@
+fund_code,min_days,max_days,purchase_rate,redemption_rate,sales_service_rate_annual,source_url,verified_at
+900001,0,7,0.001,0.015,0,https://example.invalid/demo-wide-a,2026-06-01
+900001,7,30,0.001,0.001,0,https://example.invalid/demo-wide-a,2026-06-01
+900001,30,,0.001,0,0,https://example.invalid/demo-wide-a,2026-06-01
+900002,0,7,0,0.015,0.002,https://example.invalid/demo-wide-c,2026-06-01
+900002,7,30,0,0.001,0.002,https://example.invalid/demo-wide-c,2026-06-01
+900002,30,,0,0,0.002,https://example.invalid/demo-wide-c,2026-06-01
+900003,0,7,0,0.015,0.002,https://example.invalid/demo-tech,2026-06-01
+900003,7,30,0,0.001,0.002,https://example.invalid/demo-tech,2026-06-01
+900003,30,,0,0,0.002,https://example.invalid/demo-tech,2026-06-01
+900004,0,7,0,0.015,0.002,https://example.invalid/demo-global,2026-06-01
+900004,7,30,0,0.001,0.002,https://example.invalid/demo-global,2026-06-01
+900004,30,,0,0,0.002,https://example.invalid/demo-global,2026-06-01

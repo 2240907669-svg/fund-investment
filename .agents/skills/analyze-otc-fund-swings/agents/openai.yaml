@@ -1,0 +1,4 @@
+interface:
+  display_name: "场外基金短波分析"
+  short_description: "核验行情、事件、费用和风险，输出可审计并带教学解释的调仓建议"
+  default_prompt: "Use $analyze-otc-fund-swings to update data, analyze catalysts and competing explanations, rank eligible OTC funds, apply fee and risk vetoes, and produce a sourced action brief with a scenario tree, invalidation conditions, and one reusable lesson."
