@@ -396,6 +396,7 @@ def build_document() -> None:
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         format_paragraph(p, 0, 0, 1.0)
         set_font(p.add_run(text), 9.2, True, "000000")
+    set_repeat_table_header(radar.rows[0])
     radar_rows = [
         ("A股全景", "三大指数下跌；超4600股下跌；成交2.82万亿元", "广泛风险收缩，不是少数权重拖累", "全部境内权益基金"),
         ("港股", "恒指+0.16%，恒科-0.96%；成交3095亿港元", "大盘防守强于科技，内部仍是风格切换", "沪深港云计算及港股暴露"),
@@ -435,6 +436,7 @@ def build_document() -> None:
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         format_paragraph(p, 0, 0, 1.0)
         set_font(p.add_run(text), 9.3, True, "000000")
+    set_repeat_table_header(flow.rows[0])
     flow_rows = [
         ("沪深两市主力资金", "净流出1147.08亿元", "大单口径出现显著风险收缩", "连续2—3日是否仍大额净流出"),
         ("行业广度", "31个行业中仅2个净流入、29个净流出", "接近集体撤退，不是健康的多板块轮动", "净流入行业能否扩至8个以上"),
@@ -577,6 +579,7 @@ def build_document() -> None:
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         format_paragraph(p, 0, 0, 1.0)
         set_font(p.add_run(text), 9.0, True, "000000")
+    set_repeat_table_header(next_day.rows[0])
     next_day_rows = [
         ("基准：弱修复后分化", "50%", "普跌后的技术反抽 + 资金仍谨慎", "沪指守3900；上涨家数改善但不足压倒性；电子净流出明显收窄", "不追反弹；观察最强持仓能否率先转强"),
         ("偏弱：继续释放", "30%", "尾盘未回补 + 科技拥挤继续松动", "沪指有效跌破3900；不足1000股上涨；电子/计算机继续放量净流出", "优先压降重复科技暴露，执行前核费用与到账"),
