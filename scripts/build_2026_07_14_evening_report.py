@@ -27,11 +27,11 @@ def read_csv(path: str) -> list[dict[str, str]]:
         return list(csv.DictReader(f))
 
 
-def set_run_font(run, size=None, bold=None, color=None, name="Calibri"):
+def set_run_font(run, size=None, bold=None, color=None, name="Source Han Sans CN"):
     run.font.name = name
     run._element.get_or_add_rPr().rFonts.set(qn("w:ascii"), name)
     run._element.get_or_add_rPr().rFonts.set(qn("w:hAnsi"), name)
-    run._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"), "Arial Unicode MS")
+    run._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"), "Source Han Sans CN")
     if size is not None:
         run.font.size = Pt(size)
     if bold is not None:
@@ -199,10 +199,10 @@ def build_docx():
     section.right_margin = Cm(2.0)
 
     styles = doc.styles
-    styles["Normal"].font.name = "Calibri"
-    styles["Normal"]._element.get_or_add_rPr().rFonts.set(qn("w:ascii"), "Calibri")
-    styles["Normal"]._element.get_or_add_rPr().rFonts.set(qn("w:hAnsi"), "Calibri")
-    styles["Normal"]._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"), "Arial Unicode MS")
+    styles["Normal"].font.name = "Source Han Sans CN"
+    styles["Normal"]._element.get_or_add_rPr().rFonts.set(qn("w:ascii"), "Source Han Sans CN")
+    styles["Normal"]._element.get_or_add_rPr().rFonts.set(qn("w:hAnsi"), "Source Han Sans CN")
+    styles["Normal"]._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"), "Source Han Sans CN")
     styles["Normal"].font.size = Pt(10.2)
 
     title = doc.add_paragraph()
