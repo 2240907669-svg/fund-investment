@@ -1,7 +1,7 @@
 fund_code,fund_name,market_value,holding_gain,holding_return,estimated_cost,cluster,source_image,as_of,status
 007339,易方达沪深300ETF联接C,9994.26,-5.74,-0.0006,10000.00,broad-index,screenshot-1,2026-07-12,provisional_missing_shares_and_dates
 021894,易方达半导体材料设备ETF联接C,5129.73,129.73,0.0259,5000.00,cn-semiconductor-index,screenshot-1,2026-07-12,provisional_missing_shares_and_dates
-010004,景顺长城电子信息产业股票C,4875.76,-124.24,-0.0248,5000.00,cn-tech-active,screenshot-1,2026-07-12,provisional_missing_shares_and_dates
+010004,景顺长城电子信息产业股票C,4875.76,-124.24,-0.0248,5000.00,cn-electronic-specialty-gas-semiconductor-materials,screenshot-1,2026-07-12,provisional_missing_shares_and_dates
 012922,易方达全球成长精选混合(QDII)C,3077.02,805.82,0.3548,2271.20,qdii-global-growth-active,screenshot-1,2026-07-12,provisional_missing_shares_and_dates
 021528,财通成长优选混合C,2614.76,-292.21,-0.1005,2906.97,cn-active,screenshot-1,2026-07-12,provisional_missing_shares_and_dates
 007818,国泰中证全指通信设备ETF联接C,2045.19,45.19,0.0226,2000.00,cn-communication-index,screenshot-1,2026-07-12,provisional_missing_shares_and_dates
