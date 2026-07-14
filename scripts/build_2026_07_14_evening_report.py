@@ -58,6 +58,20 @@ def set_cell_text(cell, text, bold=False, fill=None):
         set_cell_shading(cell, fill)
 
 
+def set_repeat_table_header(row):
+    tr_pr = row._tr.get_or_add_trPr()
+    tbl_header = OxmlElement("w:tblHeader")
+    tbl_header.set(qn("w:val"), "true")
+    tr_pr.append(tbl_header)
+
+
+def set_row_cant_split(row):
+    tr_pr = row._tr.get_or_add_trPr()
+    cant_split = OxmlElement("w:cantSplit")
+    cant_split.set(qn("w:val"), "true")
+    tr_pr.append(cant_split)
+
+
 def add_heading(doc, text, level=1):
     p = doc.add_paragraph()
     p.style = f"Heading {level}"
@@ -88,12 +102,16 @@ def add_table(doc, headers, rows, widths=None):
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.style = "Table Grid"
     hdr = table.rows[0].cells
+    set_repeat_table_header(table.rows[0])
+    set_row_cant_split(table.rows[0])
     for i, h in enumerate(headers):
         set_cell_text(hdr[i], h, bold=True, fill="E8EEF5")
         if widths:
             hdr[i].width = Cm(widths[i])
     for row in rows:
-        cells = table.add_row().cells
+        table_row = table.add_row()
+        set_row_cant_split(table_row)
+        cells = table_row.cells
         for i, value in enumerate(row):
             set_cell_text(cells[i], value)
             if widths:
