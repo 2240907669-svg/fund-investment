@@ -81,6 +81,15 @@ test('8 percent account drawdown activates risk veto and blocks buys', () => {
   assert.equal(plan.actions.filter((x)=>x.action==='申购草案').length,0);
 });
 
+test('missing portfolio history reports unknown drawdown and blocks buys', () => {
+  const risk = portfolioRisk([],profile,'2026-07-12');
+  assert.equal(risk.riskUnknown,true);
+  assert.equal(risk.drawdown,null);
+  const project = {profile,funds:[fund()],fees:fees(),nav:nav(),holdings:[],transactions:[],portfolio:[]};
+  const plan = planActions(project,scoreAll(project,'2026-07-12'),'2026-07-12');
+  assert.equal(plan.actions.filter((x)=>x.action==='申购草案').length,0);
+});
+
 test('exit trigger remains a review and cannot create an unverified full redemption', () => {
   const unsafeFund = fund({redemption_status:'unknown',fee_source:'',fee_verified_at:''});
   const unsafeFees = fees().map((row) => ({...row,source_url:'model://unverified'}));

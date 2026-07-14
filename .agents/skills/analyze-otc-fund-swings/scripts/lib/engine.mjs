@@ -194,7 +194,15 @@ export function scoreAll(project, asOf) {
 export function portfolioRisk(portfolioRows, profile, asOf) {
   const rows = portfolioRows.filter((row) => row.date <= asOf && number(row.total_value) > 0)
     .sort((a, b) => a.date.localeCompare(b.date));
-  if (!rows.length) return { total: profile.capitalCny, cash: profile.capitalCny, drawdown: 0, riskMode: false, cooldownRemaining: 0, warning: '缺少组合历史，按初始资金计算' };
+  if (!rows.length) return {
+    total: profile.capitalCny,
+    cash: profile.capitalCny,
+    drawdown: null,
+    riskMode: false,
+    riskUnknown: true,
+    cooldownRemaining: 0,
+    warning: '缺少组合历史，账户回撤与真实现金比例未知'
+  };
   let peak = 0, lastTrigger = -Infinity;
   rows.forEach((row, index) => {
     const total = number(row.total_value);
@@ -209,6 +217,7 @@ export function portfolioRisk(portfolioRows, profile, asOf) {
   return {
     total, cash: number(latest.cash_value), drawdown,
     riskMode: drawdown >= profile.accountDrawdownTrigger || cooldownRemaining > 0,
+    riskUnknown: false,
     cooldownRemaining, warning: ''
   };
 }
@@ -254,7 +263,7 @@ export function planActions(project, scores, asOf) {
     }
   }
 
-  if (risk.riskMode) return { risk, actions, ranked: scores.filter((item) => item.eligible).slice(0, 3) };
+  if (risk.riskMode || risk.riskUnknown) return { risk, actions, ranked: scores.filter((item) => item.eligible).slice(0, 3) };
   const ranked = scores.filter((item) => item.eligible);
   const heldCodes = new Set(holdings.map((row) => row.fund_code));
   const themes = new Map();
@@ -314,6 +323,7 @@ export function renderReport(project, scores, plan, asOf, mode) {
   const cutoff = project.tradingConstraints?.defaultPlatformCutoff ?? '通常为开放日15:00，以平台为准';
   const lines = [`# ${asOf} ${title}`, '', `- 生成时间：${now}`, `- 数据截止：${asOf}；评分只使用已公布净值`, `- 账户回撤：${formatPct(plan.risk.drawdown)}；风险模式：${plan.risk.riskMode ? '是' : '否'}`, '- 账户范围：只交易场外开放式基金，不做盘中ETF或股票交易', `- 未知价原则：盘中数据只决定是否提交申请，实际按正式基金净值确认；默认截止：${cutoff}`, '- 性质：研究与执行草案，不是收益保证，不会自动下单', ''];
   if (plan.risk.warning) lines.push(`> 数据提示：${plan.risk.warning}`, '');
+  if (plan.risk.riskUnknown) lines.push('> 风险官否决新增申购：组合历史和真实现金未核验，不能把未知回撤当作0%。', '');
   if (plan.risk.riskMode) lines.push(`> 风险官否决新增申购：风险资产上限40%，冷静期剩余${plan.risk.cooldownRemaining}个有记录交易日。`, '');
   lines.push('## 候选排名', '');
   if (!plan.ranked.length) lines.push('暂不行动：没有基金同时通过数据、费用、趋势和风险检查。', '');
