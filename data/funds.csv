@@ -1,11 +1,11 @@
 fund_code,fund_name,share_class,base_fund,category,theme,is_qdii,aum_cny,age_days,purchase_status,redemption_status,daily_limit_cny,lock_days,tracking_error,fee_source,fee_verified_at
 007339,易方达沪深300ETF联接C,C,易方达沪深300ETF联接,index,broad-index,false,,,unknown,unknown,,,,,
 021894,易方达半导体材料设备ETF联接C,C,易方达半导体材料设备ETF联接,index,cn-semiconductor-index,false,,,unknown,unknown,,,,,
-010004,景顺长城电子信息产业股票C,C,景顺长城电子信息产业股票,active-equity,cn-tech-active,false,,,unknown,unknown,,,,,
+010004,景顺长城电子信息产业股票C,C,景顺长城电子信息产业股票,active-equity,cn-tech-active,false,,,unknown,open,,,,https://www.igwfmc.com/upload/flwj/20250524/2025-05-24景顺长城电子信息产业股票型证券投资基金基金产品资料概要更新.pdf,2026-07-14
 012922,易方达全球成长精选混合(QDII)C,C,易方达全球成长精选混合(QDII),qdii-active,qdii-global-growth-active,true,,,unknown,unknown,,,,,
 021528,财通成长优选混合C,C,财通成长优选混合,active-equity,cn-active,false,,,unknown,unknown,,,,,
 007818,国泰中证全指通信设备ETF联接C,C,国泰中证全指通信设备ETF联接,index,cn-communication-index,false,,,unknown,unknown,,,,,
-019024,易方达信息行业精选股票C,C,易方达信息行业精选股票,active-equity,cn-tech-active,false,,,unknown,unknown,,,,,
+019024,易方达信息行业精选股票C,C,易方达信息行业精选股票,active-equity,cn-tech-active,false,,,unknown,open,,,,https://cdn.efunds.com.cn/owch/data/bulletin/20260519/易方达信息行业精选股票型证券投资基金（易方达信息行业精选股票C）基金产品资料概要更新.pdf?from=person,2026-07-14
 024481,财通品质甄选混合C,C,财通品质甄选混合,active-equity,cn-active,false,,,unknown,unknown,,,,,
 017731,嘉实全球产业升级股票(QDII)C,C,嘉实全球产业升级股票(QDII),qdii-active,qdii-global-active,true,,,unknown,unknown,,,,,
 014565,天弘沪深港创新药50ETF联接C,C,天弘沪深港创新药50ETF联接,index,hk-health-index,false,,,unknown,unknown,,,,,
