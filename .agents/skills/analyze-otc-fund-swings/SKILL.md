@@ -11,9 +11,9 @@ Treat this workflow as decision support, never as a promise of profit or an auth
 
 1. Read `../../../AGENTS.md`, `references/policy.md`, and `references/data-contracts.md` before changing strategy inputs or producing an action brief.
 2. Read `references/event-driven-and-teaching.md` whenever news, policy, earnings, product launches, geopolitical events, market shocks, or teaching explanations affect the decision.
-3. Run `node scripts/sync-nav.mjs --root ../../../..` when live NAV refresh is requested. Preserve provenance and continue with cached data if every public source fails.
-4. Run `node scripts/analyze.mjs --root ../../../.. --mode morning` for the morning risk brief, `--mode action` for the pre-15:00 brief, or `--mode weekly` for the weekly review.
-5. Run `node scripts/backtest.mjs --root ../../../..` before recommending that a new parameter set be used with real money.
+3. From the project root, run `node .agents/skills/analyze-otc-fund-swings/scripts/sync-nav.mjs --root .` when live NAV refresh is requested. Preserve provenance and continue with cached data if every public source fails.
+4. From the project root, run `node .agents/skills/analyze-otc-fund-swings/scripts/analyze.mjs --root . --mode morning` for the morning risk brief, `--mode action` for the pre-15:00 brief, or `--mode weekly` for the weekly review.
+5. From the project root, run `node .agents/skills/analyze-otc-fund-swings/scripts/backtest.mjs --root .` before recommending that a new parameter set be used with real money.
 6. Separate published NAV from intraday estimates. Never present an estimate as confirmed NAV.
 7. Return `暂不行动` whenever fees, redemption status, data freshness, source consistency, or risk checks are unresolved.
 8. Ask the user to confirm an executed order, then record it in `data/transactions.csv`; never log in to a sales platform or place an order.
