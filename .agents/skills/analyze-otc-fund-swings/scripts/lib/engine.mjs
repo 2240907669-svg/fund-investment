@@ -103,7 +103,7 @@ export function feeForDays(fees, fundCode, holdingDays) {
     const max = row.max_days === '' ? Infinity : number(row.max_days, Infinity);
     return holdingDays >= min && holdingDays < max;
   });
-  if (!match || !match.source_url || !match.verified_at) return null;
+  if (!match || !match.source_url || !match.verified_at || !/^https?:\/\//i.test(match.source_url)) return null;
   const purchaseRate = number(match.purchase_rate);
   const redemptionRate = number(match.redemption_rate);
   const serviceRate = number(match.sales_service_rate_annual) * holdingDays / 365;
@@ -147,7 +147,7 @@ export function scoreFund(fund, navRows, fees, profile, asOf) {
   if (!fee) vetoes.push('目标持有期费率未知');
 
   if (history.length < 21 || !latest || !fee) {
-    return { fund, eligible: false, score: -Infinity, vetoes, history, staleDays, fee };
+    return { fund, eligible: false, score: -Infinity, vetoes, history, latest, staleDays, fee };
   }
   const values = history.map((row) => number(row.nav));
   const last = values.at(-1);
@@ -236,15 +236,20 @@ export function planActions(project, scores, asOf) {
     if (positionReturn <= -profile.positionReviewDrawdown || belowTwoDays || risk.riskMode) {
       const fee = feeForDays(project.fees, holding.fund_code, Math.max(0, heldDays));
       const vetoes = [];
+      const fund = fundByCode.get(holding.fund_code);
       if (heldDays < 7) vetoes.push('持有不足7日，默认禁止主动赎回');
-      if (!fee) vetoes.push('当前持有期赎回费未知');
+      if (!fee) vetoes.push('当前持有期赎回费未由公开产品来源核验');
+      if (!fund?.fee_source || !fund?.fee_verified_at || !/^https?:\/\//i.test(fund.fee_source)) vetoes.push('基金费率来源未核验');
+      if (fund?.redemption_status !== 'open') vetoes.push('赎回状态未知或不可赎回');
+      if (risk.warning) vetoes.push('缺少组合历史，无法确认账户回撤');
       const amount = number(holding.market_value, number(holding.shares) * current);
       actions.push({
-        fund: fundByCode.get(holding.fund_code) ?? { fund_code: holding.fund_code, fund_name: '未知基金', share_class: '' },
-        action: vetoes.length ? '退出审查' : '赎回草案', amount, redemptionShares: number(holding.shares), redemptionPercentage: 1, feeRate: fee?.redemptionRate ?? null,
+        fund: fund ?? { fund_code: holding.fund_code, fund_name: '未知基金', share_class: '' },
+        action: '退出审查', amount, redemptionShares: null, redemptionPercentage: 0, feeRate: fee?.redemptionRate ?? null,
         expectedNavDate: asOf, confirmDate: '以销售平台确认规则为准', deadline: '平台截止时间前提交；通常15:00前按申请日未知净值处理',
         evidence: `持仓收益${formatPct(positionReturn)}；${belowTwoDays ? '连续两日低于20日均线' : risk.riskMode ? '账户风险模式' : '触发4%回撤审查'}`,
-        confidence: result?.confidence ?? '低', invalidation: '最新已公布净值恢复且风险触发解除', vetoes
+        confidence: result?.confidence ?? '低', invalidation: '最新已公布净值恢复且风险触发解除', vetoes,
+        executionNote: '退出审查不等于赎回指令；必须另行满足官方费率、赎回状态和午后情景阈值'
       });
     }
   }
@@ -322,12 +327,15 @@ export function renderReport(project, scores, plan, asOf, mode) {
   else plan.actions.forEach((action, index) => {
     const orderSize = action.action === '申购草案'
       ? `- 申购申请金额：${Math.floor(action.amount).toLocaleString('zh-CN')}元`
+      : action.action === '退出审查'
+        ? '- 赎回申请：暂不提交；退出审查不等于赎回指令'
       : `- 赎回申请：${action.redemptionShares ? `${action.redemptionShares.toLocaleString('zh-CN')}份（当前规则草案为${(action.redemptionPercentage * 100).toFixed(0)}%份额）` : '份额待平台确认页核对'}`;
     lines.push(`### ${index + 1}. ${action.fund.fund_name} ${action.fund.share_class}（${action.fund.fund_code}）`, '',
       `- 操作：${action.action}`, orderSize, `- 当前净值口径的市值估算：${Math.floor(action.amount).toLocaleString('zh-CN')}元（不是成交金额）`,
       `- 预计适用净值日：${action.expectedNavDate ?? '以提交时间与平台规则为准'}；成交净值提交时未知`,
       `- 预计确认：${action.confirmDate}`, `- 预计全部费用率：${action.feeRate == null ? '未知' : formatPct(action.feeRate)}`,
       `- 信号依据：${action.evidence}`, `- 置信度：${action.confidence}`, `- 最晚操作时间：${action.deadline}`,
+      ...(action.executionNote ? [`- 执行说明：${action.executionNote}`] : []),
       `- 失效条件：${action.invalidation}`, `- 风险否决项：${action.vetoes.length ? action.vetoes.join('；') : '无'}`, '');
   });
   const rejected = scores.filter((item) => !item.eligible);

@@ -81,6 +81,29 @@ test('8 percent account drawdown activates risk veto and blocks buys', () => {
   assert.equal(plan.actions.filter((x)=>x.action==='申购草案').length,0);
 });
 
+test('exit trigger remains a review and cannot create an unverified full redemption', () => {
+  const unsafeFund = fund({redemption_status:'unknown',fee_source:'',fee_verified_at:''});
+  const unsafeFees = fees().map((row) => ({...row,source_url:'model://unverified'}));
+  const project = {
+    profile,
+    funds:[unsafeFund],
+    fees:unsafeFees,
+    nav:nav(),
+    holdings:[{fund_code:'000001',shares:'1000',confirmed_nav:'2',confirmed_date:'2026-07-01',market_value:'1300'}],
+    transactions:[],
+    portfolio:[]
+  };
+  const plan = planActions(project,scoreAll(project,'2026-07-12'),'2026-07-12');
+  assert.equal(plan.actions.length,1);
+  assert.equal(plan.actions[0].action,'退出审查');
+  assert.equal(plan.actions[0].redemptionPercentage,0);
+  assert.equal(plan.actions[0].redemptionShares,null);
+  assert.ok(plan.actions[0].vetoes.includes('当前持有期赎回费未由公开产品来源核验'));
+  assert.ok(plan.actions[0].vetoes.includes('基金费率来源未核验'));
+  assert.ok(plan.actions[0].vetoes.includes('赎回状态未知或不可赎回'));
+  assert.ok(plan.actions[0].vetoes.includes('缺少组合历史，无法确认账户回撤'));
+});
+
 test('position and QDII caps constrain suggested buys', () => {
   const f1=fund(), f2=fund({fund_code:'000002',base_fund:'base-2',theme:'科技'}), f3=fund({fund_code:'000003',base_fund:'base-3',category:'qdii-index',theme:'海外',is_qdii:'true'});
   const project={profile,funds:[f1,f2,f3],fees:[...fees('000001'),...fees('000002'),...fees('000003')],nav:[...nav('000001'),...nav('000002'),...nav('000003')],holdings:[],transactions:[],portfolio:[{date:'2026-07-12',total_value:'30000',cash_value:'30000'}]};
