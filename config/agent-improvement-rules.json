@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "objectiveOrder": [
+    "费用后相对不操作的价值增量",
+    "不可接受回撤控制",
+    "概率校准",
+    "方向命中率"
+  ],
+  "requiredWorkflow": [
+    "data_steward",
+    "whole_market_scout",
+    "signal_analyst",
+    "independent_bull_researcher",
+    "independent_bear_researcher",
+    "risk_officer",
+    "allocator",
+    "execution_planner",
+    "reviewer"
+  ],
+  "requiredMarketDirections": [
+    "宽基",
+    "半导体设备",
+    "半导体",
+    "通信",
+    "AI或计算机",
+    "机器人",
+    "创新药或医疗",
+    "消费或白酒",
+    "券商或银行",
+    "军工",
+    "有色或黄金",
+    "新能源"
+  ],
+  "decisionAlternatives": [
+    "持有现有组合",
+    "持有现金",
+    "申购最佳合格候选",
+    "赎回或降低最弱暴露"
+  ],
+  "evidenceLabels": [
+    "事实",
+    "盘中估算",
+    "模型推断",
+    "未知"
+  ],
+  "maxBuyCandidates": 3,
+  "moneyFlowRule": "主力资金、ETF份额申赎、成交额和涨跌幅必须分列，缺失写未知，不得互相冒充",
+  "learningRule": "永久规则更新必须满足config/review-loop.json的样本、证据、无前视回测和测试门槛",
+  "reportGate": {
+    "requiredSections": [
+      "全市场机会扫描",
+      "资金流与主力资金动向",
+      "可以买什么",
+      "独立多头论证",
+      "独立空头论证",
+      "费用后比较",
+      "只看这一页：行动结论"
+    ],
+    "requiredPatterns": [
+      {"id": "data_cutoff", "description": "数据截止或抓取时间", "pattern": "数据截止|抓取时间"},
+      {"id": "official_nav", "description": "正式净值", "pattern": "正式净值"},
+      {"id": "intraday_estimate", "description": "盘中估算", "pattern": "盘中估算"},
+      {"id": "flow_in_leaders", "description": "流入前五", "pattern": "流入前五"},
+      {"id": "flow_out_leaders", "description": "流出前五", "pattern": "流出前五"},
+      {"id": "market_regime", "description": "资金状态判断", "pattern": "普遍撤离|板块轮动|存量轮动|增量共振"},
+      {"id": "buy_decision", "description": "明确买入或不买结论", "pattern": "今天不买|今日买入结论|申购金额"},
+      {"id": "fees", "description": "费用或费率", "pattern": "费用|费率"},
+      {"id": "deadline", "description": "平台截止时间", "pattern": "截止时间|申请截止|提交截止"},
+      {"id": "invalidation", "description": "失效或推翻条件", "pattern": "失效条件|推翻条件|推翻结论"},
+      {"id": "scenario_probabilities", "description": "三种概率情景", "pattern": "基准[\\s\\S]{0,300}%[\\s\\S]{0,300}偏强[\\s\\S]{0,300}%[\\s\\S]{0,300}偏弱[\\s\\S]{0,300}%"},
+      {"id": "source", "description": "来源或链接", "pattern": "来源|https?://"}
+    ]
+  }
+}
