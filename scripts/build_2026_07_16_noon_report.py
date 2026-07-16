@@ -70,6 +70,7 @@ def latest_navs() -> dict[str, dict[str, str]]:
 
 def holdings_rows() -> tuple[list[dict[str, str]], float]:
     funds = {r["fund_code"]: r for r in read_csv("data/funds.csv")}
+    intake = {r["fund_code"]: r for r in read_csv("data/holding-intake.csv")}
     navs = latest_navs()
     rows, total = [], 0.0
     for h in read_csv("data/holdings.csv"):
@@ -79,8 +80,8 @@ def holdings_rows() -> tuple[list[dict[str, str]], float]:
         value = float(nav.get("nav") or h.get("confirmed_nav") or 0)
         market_value = shares * value
         total += market_value
-        cost = float(h.get("cost_basis") or 0)
-        ret = (value / cost - 1) if cost else 0
+        estimated_cost = float(intake.get(code, {}).get("estimated_cost") or 0)
+        ret = (market_value / estimated_cost - 1) if estimated_cost else 0
         rows.append({
             "code": code,
             "name": funds.get(code, {}).get("fund_name", code),
@@ -352,8 +353,16 @@ def flush_table(doc: Document, lines: list[str]):
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     for i, h in enumerate(headers):
         set_cell(table.rows[0].cells[i], h, True, "E7EEF5")
+    header_pr = table.rows[0]._tr.get_or_add_trPr()
+    header_repeat = OxmlElement("w:tblHeader")
+    header_repeat.set(qn("w:val"), "true")
+    header_pr.append(header_repeat)
     for line in lines[2:]:
-        cells = table.add_row().cells
+        row = table.add_row()
+        row_pr = row._tr.get_or_add_trPr()
+        cant_split = OxmlElement("w:cantSplit")
+        row_pr.append(cant_split)
+        cells = row.cells
         for i, value in enumerate([x.strip() for x in line.strip("|").split("|")]):
             set_cell(cells[i], value)
 
