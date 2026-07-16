@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-07-16T12:50:00+08:00",
+  "purpose": "未来1至2个季度潜在市场主线及场外开放式基金观察池，不代表立即申购指令",
+  "rankingMethod": [
+    "产业景气和盈利兑现",
+    "新增政策、订单和产品催化",
+    "资金流持续性而非单日涨幅",
+    "估值和价格是否已提前反映",
+    "场外开放式基金的主题纯度、规模、费率、申赎状态和确认时滞"
+  ],
+  "portfolioGuardrails": {
+    "currentPositionCount": 18,
+    "configuredMaxPositions": 3,
+    "cashAndTrueDrawdownStatus": "unknown",
+    "immediateNewSubscription": "vetoed_pending_position_and_cash_reconciliation",
+    "maxNewThemesAfterReconciliation": 1,
+    "maxSimultaneousMainlines": 3,
+    "rule": "先减少重叠持仓，再从已验证主线中选择一只场外基金；不得把观察池全部买入"
+  },
+  "rankings": [
+    {
+      "rank": 1,
+      "themeId": "ai-applications-cloud-software",
+      "themeName": "人工智能应用、云服务与软件",
+      "mainlineProbability": 0.30,
+      "thesis": "人工智能投资正从单纯训练硬件扩展到智能体、企业软件、云服务和数据治理，商业化收入与付费席位已有验证。",
+      "counterThesis": "国内软件公司收入兑现可能慢于主题交易，指数成分也可能包含弱盈利或高估值公司。",
+      "buyUnlock": [
+        "云计算或软件服务指数连续2个交易日跑赢沪深300，累计超额收益至少1.5个百分点",
+        "同一资金口径下，计算机或软件服务至少1个交易日主力净流入不低于10亿元，并在下一交易日上午未完全反转",
+        "产业大会、公司公告或财报出现可量化订单、付费用户、收入或资本开支证据，而不是仅有领导出席或产品概念",
+        "申请日前单日涨幅不超过3%，避免用未知价申购追逐盘中脉冲"
+      ],
+      "invalidation": [
+        "连续2个交易日相对沪深300走弱且主力资金转为净流出",
+        "产业催化只有演示和发布，没有订单、用户或收入兑现",
+        "指数重新跌破20日均线后2个交易日不能收复"
+      ],
+      "fundCandidates": [
+        {
+          "fundCode": "019331",
+          "fundName": "华泰柏瑞中证沪港深云计算产业ETF联接C",
+          "role": "preferred_existing_holding",
+          "reason": "覆盖沪港深云计算产业，可复用现有持仓，避免增加新的基金数量。",
+          "status": "watch_existing_no_immediate_subscription",
+          "dueDiligence": "申购状态、规模和官方费率仍需在实际下单日前复核"
+        },
+        {
+          "fundCode": "012620",
+          "fundName": "嘉实中证软件服务ETF联接C",
+          "role": "secondary_purer_software_candidate",
+          "reason": "软件服务暴露更直接，适合在国内人工智能应用收入开始兑现后作为替代观察。",
+          "status": "watch_only",
+          "dueDiligence": "近期趋势较弱；需复核最新规模、申购状态、跟踪误差和平台费率"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "themeId": "ai-network-power-infrastructure",
+      "themeName": "人工智能网络、数据中心电力与冷却基础设施",
+      "mainlineProbability": 0.25,
+      "thesis": "数据中心资本开支和用电需求继续上升，网络互联、光模块、印制电路板、供配电和冷却是更可验证的物理瓶颈。",
+      "counterThesis": "通信设备交易拥挤、波动大；公用事业指数并不等同于数据中心电力设备，产品映射存在偏差。",
+      "buyUnlock": [
+        "通信设备板块连续2个交易日主力净流入，且相对沪深300累计超额收益至少2个百分点",
+        "电子板块的大额净流出收窄到50亿元以内，或转为净流入",
+        "相关公司订单、资本开支或交付指引上调，而不是只有算力需求叙事",
+        "基金对应指数站回20日均线并保持2个交易日"
+      ],
+      "invalidation": [
+        "通信设备继续出现单日50亿元以上净流出并创20日新低",
+        "云厂商资本开支下修或电网接入瓶颈导致数据中心项目推迟",
+        "把传统电力公用事业基金误当成纯数据中心供配电基金"
+      ],
+      "fundCandidates": [
+        {
+          "fundCode": "007818",
+          "fundName": "国泰中证全指通信设备ETF联接C",
+          "role": "preferred_existing_network_holding",
+          "reason": "现有持仓中对光通信和网络设备暴露较直接，但当前资金仍明显流出。",
+          "status": "watch_existing_wait_for_flow_reversal",
+          "dueDiligence": "申赎状态、规模和官方费率仍需在实际下单日前复核"
+        },
+        {
+          "fundCode": "018173",
+          "fundName": "华泰柏瑞中证全指电力公用事业ETF联接C",
+          "role": "indirect_power_candidate",
+          "reason": "可作为电力需求上升的间接受益观察工具，但不是数据中心电气设备或液冷的纯主题基金。",
+          "status": "watch_only_not_pure_ai_infrastructure",
+          "dueDiligence": "必须复核指数成分、规模、申购状态和平台费率；不得仅因人工智能用电叙事买入"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "themeId": "innovative-drugs",
+      "themeName": "创新药与生物科技",
+      "mainlineProbability": 0.20,
+      "thesis": "授权交易、海外临床进展和政策改善可以形成独立于科技硬件的盈利与估值主线。",
+      "counterThesis": "单日大涨后容易透支短期催化，临床、审批和商业化失败风险高，行业内部差异极大。",
+      "buyUnlock": [
+        "完成上一笔赎回确认后再评估，不在待确认状态下反向申购",
+        "指数从高点回撤3%至6%后止跌，或横盘至少3个交易日且资金重新净流入",
+        "新授权交易、临床数据或审批结果具有金额、分期付款或适应症等可量化信息",
+        "相对20日均线乖离不高于8%，相对强弱指标低于70"
+      ],
+      "invalidation": [
+        "关键临床、审批或授权交易低于预期",
+        "高位放量滞涨后跌破20日均线",
+        "只有会议和政策表态，没有企业现金流或管线价值兑现"
+      ],
+      "fundCandidates": [
+        {
+          "fundCode": "014565",
+          "fundName": "天弘沪深港创新药50ETF联接C",
+          "role": "preferred_familiar_cross_market_candidate",
+          "reason": "覆盖沪深港创新药，且已有交易与跟踪记录，便于统一复盘。",
+          "status": "future_reentry_watch_after_redemption_confirmation",
+          "dueDiligence": "最新规模、申购状态、官方费率及赎回确认结果需复核"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "themeId": "physical-ai-robotics",
+      "themeName": "具身智能与机器人",
+      "mainlineProbability": 0.15,
+      "thesis": "人工智能从数字世界走向制造和服务场景，若订单、量产和成本下降兑现，机器人可能成为第二阶段主线。",
+      "counterThesis": "当前很多公司仍处于样机和小批量阶段，主题估值可能明显领先利润。",
+      "buyUnlock": [
+        "龙头公司披露量产、交付或订单金额，且不是框架协议",
+        "机器人指数5个交易日相对沪深300收益转正，并站上20日均线2个交易日",
+        "板块上涨家数和成交额同步扩散，不由少数高权重股票独自拉动"
+      ],
+      "invalidation": [
+        "量产或交付时间推迟",
+        "主题放量上涨但订单和利润预期没有上调",
+        "指数跌破前低且资金连续3个交易日净流出"
+      ],
+      "fundCandidates": [
+        {
+          "fundCode": "018345",
+          "fundName": "华夏中证机器人ETF发起式联接C",
+          "role": "preferred_new_watch_candidate",
+          "reason": "指数暴露清晰、成立时间超过三年，适合作为机器人主线是否形成的观察标尺。",
+          "status": "watch_only_no_immediate_subscription",
+          "dueDiligence": "下单日前复核最新规模、申购状态、跟踪误差和平台费率"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "themeId": "hbm-semiconductor-cycle",
+      "themeName": "高带宽存储与半导体周期",
+      "mainlineProbability": 0.10,
+      "thesis": "高带宽存储仍受人工智能服务器需求支撑，但不能外推为所有通用存储和全部半导体同步景气。",
+      "counterThesis": "通用动态随机存取存储器价格高度周期化，扩产、上市融资和交易拥挤可能压制估值。",
+      "buyUnlock": [
+        "半导体板块连续2个交易日主力净流入，且电子板块不再出现大额资金撤离",
+        "对应指数站回20日均线并保持2个交易日",
+        "公司财报确认高带宽存储收入和毛利率上调，而不是仅凭产品发布或上市预期"
+      ],
+      "invalidation": [
+        "通用存储现货或合约价格转弱",
+        "扩产导致供给预期上升而终端需求没有同步上调",
+        "半导体板块继续显著跑输大盘并出现单日80亿元以上净流出"
+      ],
+      "fundCandidates": [
+        {
+          "fundCode": "021894",
+          "fundName": "易方达半导体材料设备ETF联接C",
+          "role": "existing_tactical_only",
+          "reason": "更偏材料设备，不是高带宽存储纯主题；只能用于半导体整体修复的战术观察。",
+          "status": "no_new_strategic_subscription",
+          "dueDiligence": "上一笔赎回确认、剩余份额、申购状态和官方费率需先核对"
+        }
+      ]
+    }
+  ],
+  "selectionRule": {
+    "watchlistIsNotPortfolio": true,
+    "firstChoiceNow": "华泰柏瑞中证沪港深云计算产业ETF联接C",
+    "firstChoiceCondition": "仅在人工智能应用和云服务满足资金、相对强度与可量化产业催化三项解锁条件后考虑按金额分批申购",
+    "secondChoiceNow": "国泰中证全指通信设备ETF联接C",
+    "secondChoiceCondition": "仅在通信设备资金连续回流且指数站回20日均线后考虑，不在当前净流出状态下补仓",
+    "diversifierChoice": "天弘沪深港创新药50ETF联接C",
+    "diversifierCondition": "等待上一笔赎回确认和高位乖离收敛后再评估，禁止追逐单日大涨"
+  },
+  "sourceUrls": [
+    "https://www.microsoft.com/en-us/investor/earnings/FY-2026-Q3/press-release-webcast",
+    "https://www.iea.org/news/data-centre-electricity-use-surged-in-2025-even-with-tightening-bottlenecks-driving-a-scramble-for-solutions",
+    "https://www.iea.org/reports/energy-and-ai/energy-demand-from-ai",
+    "https://investors.micron.com/news-releases/news-release-details/micron-technology-inc-reports-record-results-third-quarter",
+    "https://static.sse.com.cn/stock/disclosure/announcement/c/202605/002170_20260527_23QQ.pdf",
+    "https://english.shanghai.gov.cn/en-Events/20260624/9cc202d708504b56ba32f70fbd61ef79.html",
+    "https://www.jsfund.cn/main/fund/012620/fundNav.shtml",
+    "https://www.chinaamc.com.cn/fund/018345/index.shtml"
+  ]
+}
