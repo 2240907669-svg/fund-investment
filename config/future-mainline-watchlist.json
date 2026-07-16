@@ -44,7 +44,10 @@
           "role": "preferred_existing_holding",
           "reason": "覆盖沪港深云计算产业，可复用现有持仓，避免增加新的基金数量。",
           "status": "watch_existing_no_immediate_subscription",
-          "dueDiligence": "申购状态、规模和官方费率仍需在实际下单日前复核"
+          "latestVerifiedShareClassAumCny": 141911848.81,
+          "latestVerifiedTotalFundAumCny": 202971915.55,
+          "aumAsOf": "2026-03-31",
+          "dueDiligence": "规模已超过项目最低门槛；申购状态和官方费率仍需在实际下单日前复核"
         },
         {
           "fundCode": "012620",
@@ -52,7 +55,10 @@
           "role": "secondary_purer_software_candidate",
           "reason": "软件服务暴露更直接，适合在国内人工智能应用收入开始兑现后作为替代观察。",
           "status": "watch_only",
-          "dueDiligence": "近期趋势较弱；需复核最新规模、申购状态、跟踪误差和平台费率"
+          "latestVerifiedShareClassAumCny": 2018000000,
+          "latestVerifiedTotalFundAumCny": 2190000000,
+          "aumAsOf": "2026-03-31",
+          "dueDiligence": "规模和开放状态通过初筛但近期趋势较弱；需复核跟踪误差和平台实际费率"
         }
       ]
     },
@@ -81,7 +87,9 @@
           "role": "preferred_existing_network_holding",
           "reason": "现有持仓中对光通信和网络设备暴露较直接，但当前资金仍明显流出。",
           "status": "watch_existing_wait_for_flow_reversal",
-          "dueDiligence": "申赎状态、规模和官方费率仍需在实际下单日前复核"
+          "latestVerifiedTotalFundAumCny": 952000000,
+          "aumAsOf": "2026-03-31",
+          "dueDiligence": "规模通过项目最低门槛；申赎状态和官方费率仍需在实际下单日前复核"
         },
         {
           "fundCode": "018173",
@@ -89,7 +97,10 @@
           "role": "indirect_power_candidate",
           "reason": "可作为电力需求上升的间接受益观察工具，但不是数据中心电气设备或液冷的纯主题基金。",
           "status": "watch_only_not_pure_ai_infrastructure",
-          "dueDiligence": "必须复核指数成分、规模、申购状态和平台费率；不得仅因人工智能用电叙事买入"
+          "latestVerifiedShareClassAumCny": 283323861.53,
+          "latestVerifiedTotalFundAumCny": 417767875.60,
+          "aumAsOf": "2026-03-31",
+          "dueDiligence": "规模通过项目最低门槛，但必须复核指数成分、申购状态和平台费率；不得仅因人工智能用电叙事买入"
         }
       ]
     },
@@ -118,7 +129,9 @@
           "role": "preferred_familiar_cross_market_candidate",
           "reason": "覆盖沪深港创新药，且已有交易与跟踪记录，便于统一复盘。",
           "status": "future_reentry_watch_after_redemption_confirmation",
-          "dueDiligence": "最新规模、申购状态、官方费率及赎回确认结果需复核"
+          "latestVerifiedShareClassAumCny": 780000000,
+          "aumAsOf": "2026-03-31",
+          "dueDiligence": "规模通过项目最低门槛；官方费率、平台状态及赎回确认结果需复核"
         }
       ]
     },
@@ -146,7 +159,10 @@
           "role": "preferred_new_watch_candidate",
           "reason": "指数暴露清晰、成立时间超过三年，适合作为机器人主线是否形成的观察标尺。",
           "status": "watch_only_no_immediate_subscription",
-          "dueDiligence": "下单日前复核最新规模、申购状态、跟踪误差和平台费率"
+          "latestVerifiedShareClassAumCny": 1385146619.53,
+          "latestVerifiedTotalFundAumCny": 2054023394.83,
+          "aumAsOf": "2026-03-31",
+          "dueDiligence": "规模和开放状态通过初筛；下单日前复核跟踪误差和平台实际费率"
         }
       ]
     },
