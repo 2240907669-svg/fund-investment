@@ -1,3 +1,4 @@
 id,submitted_at,confirmed_at,fund_code,side,amount,shares,nav,fees,status
-TX-20260714-010004-SELL-001,2026-07-14T14:43:59+08:00,,010004,sell,,,,,submitted
-TX-20260715-021894-SELL-001,2026-07-15T14:59:00+08:00,,021894,sell,,350,,,submitted_user_reported_time_approximate
+TX-20260714-010004-SELL-001,2026-07-14T14:43:59+08:00,,010004,sell,,432.9199,,,confirmed
+TX-20260715-021894-SELL-001,2026-07-15T14:59:00+08:00,,021894,sell,,350,,,confirmed
+TX-20260716-021894-SELL-001,,,021894,sell,,197,,,confirmed
