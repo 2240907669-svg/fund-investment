@@ -19,6 +19,26 @@ export function validateInvestmentBrief(markdown, rules) {
     .filter(({ pattern }) => !new RegExp(pattern, 'i').test(markdown))
     .map(({ id, description }) => ({ id, description }));
 
+  const namingPolicy = gate.fundNamingPolicy;
+  if (namingPolicy?.forbidSixDigitCodes) {
+    const violatingSections = namingPolicy.sections.filter((section) => {
+      const heading = new RegExp(`^#{1,6}\\s+${escapeRegExp(section)}(?:\\s|$)`, 'm');
+      const match = heading.exec(markdown);
+      if (!match) return false;
+      const sectionStart = match.index + match[0].length;
+      const remainder = markdown.slice(sectionStart);
+      const nextHeading = /^#{1,6}\s+/m.exec(remainder);
+      const sectionBody = nextHeading ? remainder.slice(0, nextHeading.index) : remainder;
+      return /\b\d{6}\b/.test(sectionBody);
+    });
+    if (violatingSections.length > 0) {
+      missingPatterns.push({
+        id: 'fund_full_name_only',
+        description: `${namingPolicy.description}；违规章节：${violatingSections.join('、')}`
+      });
+    }
+  }
+
   return {
     ok: missingSections.length === 0 && missingPatterns.length === 0,
     missingSections,

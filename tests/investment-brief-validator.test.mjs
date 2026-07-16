@@ -42,3 +42,12 @@ test('holdings-only brief fails on missing market, debate, and buy research', ()
   assert.ok(result.missingSections.includes('可以买什么'));
   assert.ok(result.missingSections.includes('独立空头论证'));
 });
+
+test('user-facing action sections reject six-digit fund codes', () => {
+  const result = validateInvestmentBrief(
+    completeBrief.replace('申请截止时间14:50', '申请截止时间14:50；赎回019024 15%'),
+    rules
+  );
+  assert.equal(result.ok, false);
+  assert.ok(result.missingPatterns.some(({ id }) => id === 'fund_full_name_only'));
+});
