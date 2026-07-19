@@ -49,6 +49,8 @@ const requiredFiles = [
   "config/profile.json",
   "config/trading-constraints.json",
   "config/noon-decision-rules.json",
+  "config/context-rotation.json",
+  "state/CURRENT_HANDOFF.md",
   "data/holdings.csv",
   "data/holding-intake.csv",
   "data/transactions.csv",

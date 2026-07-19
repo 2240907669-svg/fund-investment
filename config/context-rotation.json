@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "timezone": "Asia/Shanghai",
+  "handoffFile": "state/CURRENT_HANDOFF.md",
+  "registryFile": "data/conversation-registry.json",
+  "roles": {
+    "noon": {
+      "label": "午报及当日决策",
+      "maxTrackedRuns": 15,
+      "maxCalendarDays": 7,
+      "reason": "每日最多五次盘中跟踪，内容增长最快"
+    },
+    "evening": {
+      "label": "晚复盘",
+      "maxTrackedRuns": 10,
+      "maxCalendarDays": 14,
+      "reason": "每日一次完整复盘，按两周轮换"
+    }
+  },
+  "earlyRotationSignals": [
+    "系统已对早期对话进行摘要压缩",
+    "无法从项目文件核验但必须依赖早期聊天记忆",
+    "同一持仓、交易或规则在前后回答中冲突",
+    "再次要求用户提供项目中已经存在的数据",
+    "午间行动与晚间复盘职责在同一任务中混杂"
+  ],
+  "rotationSequence": [
+    "刷新CURRENT_HANDOFF.md",
+    "创建同一基金项目下的新任务",
+    "将对应主动自动任务迁移到新任务",
+    "在新任务运行项目启动检查",
+    "确认新任务ready或ready_with_warnings",
+    "经用户确认后归档旧任务"
+  ],
+  "userCommand": "轮换基金对话",
+  "archivePolicy": "never_archive_before_user_confirmation_and_successful_migration"
+}
