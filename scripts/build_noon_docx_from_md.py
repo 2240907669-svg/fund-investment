@@ -268,7 +268,7 @@ def build(source: Path, output: Path) -> None:
         add_table(doc, table_lines)
 
     props = doc.core_properties
-    props.title = "2026-07-17 基金午间研究报告"
+    props.title = output.stem
     props.subject = "场外开放式基金午间研究与下午行动卡"
     props.author = "Codex"
     output.parent.mkdir(parents=True, exist_ok=True)
