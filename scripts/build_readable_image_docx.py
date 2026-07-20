@@ -63,8 +63,9 @@ def wrap(draw: ImageDraw.ImageDraw, text: str, selected_font, width: int) -> lis
 
 
 class Paginator:
-    def __init__(self, output_dir: Path):
+    def __init__(self, output_dir: Path, report_title: str):
         self.output_dir = output_dir
+        self.report_title = report_title
         self.output_dir.mkdir(parents=True, exist_ok=True)
         for old in self.output_dir.glob("page-*.png"):
             old.unlink()
@@ -81,7 +82,7 @@ class Paginator:
         self.page_no += 1
         self.image = Image.new("RGB", (PAGE_W, PAGE_H), "white")
         self.draw = ImageDraw.Draw(self.image)
-        self.draw.text((MARGIN_X, 30), "2026-07-17 基金午间研究报告", font=FONTS["small"], fill=COLORS["muted"])
+        self.draw.text((MARGIN_X, 30), self.report_title, font=FONTS["small"], fill=COLORS["muted"])
         self.draw.line((MARGIN_X, 54, PAGE_W - MARGIN_X, 54), fill=COLORS["rule"], width=1)
         self.y = TOP
 
@@ -126,9 +127,11 @@ class Paginator:
 
 
 def render_markdown(source: Path, output_dir: Path) -> list[Path]:
-    pager = Paginator(output_dir)
+    source_text = source.read_text(encoding="utf-8")
+    first_heading = next((line[2:].strip() for line in source_text.splitlines() if line.startswith("# ")), source.stem)
+    pager = Paginator(output_dir, first_heading)
     table_header: list[str] | None = None
-    for raw in source.read_text(encoding="utf-8").splitlines():
+    for raw in source_text.splitlines():
         line = raw.strip()
         if not line:
             continue
@@ -146,7 +149,7 @@ def render_markdown(source: Path, output_dir: Path) -> list[Path]:
         if line.startswith("### "):
             pager.add_block(line[4:], "h3")
             continue
-        if line.startswith("| "):
+        if line.startswith("|"):
             values = [clean(v.strip()) for v in line.strip("|").split("|")]
             if all(re.fullmatch(r":?-+:?", value.replace(" ", "")) for value in values):
                 continue
@@ -186,7 +189,7 @@ def build_docx(pages: list[Path], output: Path):
         if idx < len(pages) - 1:
             p.add_run().add_break(WD_BREAK.PAGE)
     props = doc.core_properties
-    props.title = "2026-07-17 基金午间研究报告"
+    props.title = output.stem
     props.subject = "中文可读图像页DOCX；可编辑源见同名Markdown"
     props.author = "Codex"
     doc.save(output)
