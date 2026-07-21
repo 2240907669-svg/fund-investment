@@ -12,8 +12,8 @@
     "evening": {
       "threadId": "019f604f-024b-7722-b3c5-18da8dcd62d9",
       "openedAt": "2026-07-15T00:00:00+08:00",
-      "trackedRunCount": 1,
-      "lastRunAt": "2026-07-20T23:40:35+08:00",
+      "trackedRunCount": 2,
+      "lastRunAt": "2026-07-22T03:01:14+08:00",
       "rotationStatus": "active"
     }
   }
